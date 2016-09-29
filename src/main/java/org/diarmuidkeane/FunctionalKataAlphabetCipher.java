@@ -15,14 +15,15 @@ public class FunctionalKataAlphabetCipher {
     final static String testMessage ="meetmebythetree";
     final static String encryptedTestMessage ="egsgqwtahuiljgs";
 
-    char int2char(int i){
+    private char int2char(int i){
         return (char)((int)'a'+i);
     }
 
-    int normalize(int charValue){
+    private int normalize(int charValue){
         return charValue-(int)'a';
     }
-    int char2int(char a){
+    
+    private int char2int(char a){
         return normalize((int)a);
     }
 
@@ -30,7 +31,7 @@ public class FunctionalKataAlphabetCipher {
      * generates an unevaluated cyclical infinite stream of the characters of the string repeated infinitely
      * ( or as long as you want them )
      */
-    Stream<Character> string2LoopingStream(String string){
+    private Stream<Character> string2LoopingStream(String string){
         final int stringLength = string.length();
 
         return Stream.generate(new Supplier<Character>() {
@@ -42,15 +43,15 @@ public class FunctionalKataAlphabetCipher {
         });
     }
 
-    String encode(String input){
+    private String encode(String input){
         return zipStreams(input , (x, y) -> (x+y)% cipherPeriod).map(Object::toString).collect(Collectors.joining(""));
     }
 
-    String decode(String input){
+    private String decode(String input){
         return zipStreams(input,(x, y) -> (-x+y+cipherPeriod)% cipherPeriod).map(Object::toString).collect(Collectors.joining(""));
     }
 
-    Stream<Character> zipStreams(String message, BiFunction<Integer,Integer,Integer> lambda) {
+    private Stream<Character> zipStreams(String message, BiFunction<Integer,Integer,Integer> lambda) {
         final IntStream keyStream = string2LoopingStream(keyword).map(this::char2int).mapToInt(Integer::intValue);
         final IntStream messageStream = message.chars().map(this::normalize);
         final Stream<Character> outputStream = zip(keyStream, messageStream, lambda).map(this::int2char);
@@ -68,7 +69,7 @@ public class FunctionalKataAlphabetCipher {
      * zip for Java8 based on Jubobs' solution to stack overflow question
      * http://stackoverflow.com/questions/17640754/zipping-streams-using-jdk8-with-lambda-java-util-stream-streams-zip
      */
-    <A, B, C> Stream<Integer> zip(IntStream a,
+    private <A, B, C> Stream<Integer> zip(IntStream a,
                                   IntStream b,
                                   BiFunction<? super Integer, ? super Integer, ? extends Integer> zipper) {
         Spliterator<? extends Integer> aSpliterator = Objects.requireNonNull(a).spliterator();
